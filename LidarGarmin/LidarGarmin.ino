@@ -23,12 +23,19 @@
 
 #include <Wire.h>
 #include <LIDARLite.h>
+#include <U8x8lib.h>
 
 LIDARLite myLidarLite;
+U8X8_SSD1306_128X64_NONAME_HW_I2C u8x8(/* reset=*/ U8X8_PIN_NONE);    
+char str[16];
 
 void setup()
 {
   Serial.begin(115200); // Initialize serial connection to display distance readings
+  u8x8.begin();
+  u8x8.setPowerSave(0);
+  u8x8.setFont(u8x8_font_px437wyse700b_2x2_r);
+  u8x8.drawString(0, 0, "Lidar");
 
   /*
     begin(int configuration, bool fasti2c, char lidarliteAddress)
@@ -87,11 +94,18 @@ void loop()
   */
 
   // Take a measurement with receiver bias correction and print to serial terminal
-  Serial.println(myLidarLite.distance());
-
+  int dist = myLidarLite.distance();
+   Serial.println(dist); 
+   sprintf(str, "%4d", dist); 
+  u8x8.drawString(0, 3, str); 
+    
   // Take 99 measurements without receiver bias correction and print to serial terminal
-  for(int i = 0; i < 99; i++)
+  for(int i = 0; i < 1; i++)
   {
-    Serial.println(myLidarLite.distance(false));
-  }
+   dist = myLidarLite.distance(false);
+   Serial.println(dist); 
+   sprintf(str, "%4d", dist);
+  u8x8.drawString(0, 5, str);
+   }
+delay(1000);
 }
